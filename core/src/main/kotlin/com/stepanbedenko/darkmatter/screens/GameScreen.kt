@@ -7,7 +7,9 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.stepanbedenko.darkmatter.DarkMatter
 import com.stepanbedenko.darkmatter.UNIT_SCALE
+import com.stepanbedenko.darkmatter.V_WIDTH
 import com.stepanbedenko.darkmatter.ecs.component.*
+import com.stepanbedenko.darkmatter.ecs.system.DAMAGE_AREA_HEIGHT
 import ktx.ashley.entity
 import ktx.ashley.get
 import ktx.ashley.with
@@ -33,6 +35,17 @@ class GameScreen(game: DarkMatter) : DarkMatterScreen(game) {
             with<GraphicComponent>()
             with<PlayerComponent>()
             with<FacingComponent>()
+        }
+
+        engine.entity {
+            with<TransformComponent>{
+                size.set(
+                    V_WIDTH.toFloat(),
+                    DAMAGE_AREA_HEIGHT
+                )
+            }
+            with<AnimationComponent>{ type =AnimationType.DARK_MATTER }
+            with<GraphicComponent>()
         }
 
     }

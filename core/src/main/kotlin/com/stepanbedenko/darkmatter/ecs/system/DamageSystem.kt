@@ -10,7 +10,7 @@ import ktx.ashley.allOf
 import ktx.ashley.get
 import kotlin.math.max
 
-private const val DAMAGE_AREA_HEIGHT = 2f
+const val DAMAGE_AREA_HEIGHT = 2f
 private const val DAMAGE_PER_SECOND = 25f
 private const val DEATH_EXPLOSION_DURATION = 0.9f
 
