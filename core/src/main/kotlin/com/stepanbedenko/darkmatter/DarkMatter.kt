@@ -19,18 +19,24 @@ import ktx.log.Logger
 import ktx.log.logger
 
 const val UNIT_SCALE:Float = 1/16f
+const val V_WIDTH_PIXELS = 135
+const val V_HEIGHT_PIXELS = 240
 const val V_HEIGHT = 16
 const val V_WIDTH = 9
 private val LOG: Logger = logger<DarkMatter>()
 
 class DarkMatter : KtxGame<DarkMatterScreen>() {
+    val uiViewport = FitViewport(V_WIDTH_PIXELS.toFloat(), V_HEIGHT_PIXELS.toFloat())
     val gameViewport = FitViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat())
     val batch:  Batch by lazy { SpriteBatch() }
     val graphicAtlas by lazy { TextureAtlas(Gdx.files.internal("graphics/graphics.atlas")) }
+    val backgroundTexture by lazy { Texture(Gdx.files.internal("graphics/background.png"))}
+    val gameEventManager = GameEventManager()
 
     val engine: Engine by lazy { PooledEngine().apply {
         addSystem(PlayerInputSystem(gameViewport))
         addSystem(MoveSystem())
+        addSystem(PowerUpSystem(gameEventManager))
         addSystem(DamageSystem())
         addSystem(PlayerAnimationSystem(
             graphicAtlas.findRegion("ship_base"),
@@ -38,6 +44,7 @@ class DarkMatter : KtxGame<DarkMatterScreen>() {
             graphicAtlas.findRegion("ship_right")
             )
         )
+        addSystem(AttachSystem())
         addSystem(
             PlayerAnimationSystem(
                 graphicAtlas.findRegion("ship_base"),
@@ -45,7 +52,12 @@ class DarkMatter : KtxGame<DarkMatterScreen>() {
                 graphicAtlas.findRegion("ship_right")
         ))
         addSystem(AnimationSystem(graphicAtlas))
-        addSystem(RenderSystem(batch,gameViewport))
+        addSystem(RenderSystem(batch,
+            gameViewport,
+            uiViewport,
+            backgroundTexture,
+            gameEventManager)
+        )
         addSystem(RemoveSystem())
         addSystem(DebugSystem())
         }
@@ -65,5 +77,6 @@ class DarkMatter : KtxGame<DarkMatterScreen>() {
         batch.dispose()
 
         graphicAtlas.dispose()
+        backgroundTexture.dispose()
     }
 }
