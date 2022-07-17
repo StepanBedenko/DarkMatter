@@ -2,6 +2,8 @@ package com.stepanbedenko.darkmatter.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import com.stepanbedenko.darkmatter.GameEvent
+import com.stepanbedenko.darkmatter.GameEventManager
 import com.stepanbedenko.darkmatter.ecs.component.PlayerComponent
 import com.stepanbedenko.darkmatter.ecs.component.RemoveComponent
 import com.stepanbedenko.darkmatter.ecs.component.TransformComponent
@@ -14,7 +16,9 @@ const val DAMAGE_AREA_HEIGHT = 2f
 private const val DAMAGE_PER_SECOND = 25f
 private const val DEATH_EXPLOSION_DURATION = 0.9f
 
-class DamageSystem : IteratingSystem(allOf(PlayerComponent::class,TransformComponent::class).exclude(RemoveComponent::class.java).get()) {
+class DamageSystem(
+    private val gameEventManager: GameEventManager
+) : IteratingSystem(allOf(PlayerComponent::class,TransformComponent::class).exclude(RemoveComponent::class.java).get()) {
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val transform = entity[TransformComponent.mapper]
         require(transform != null) {"Entity |entity| must have a TransformComponent. entity=$entity"}
@@ -35,9 +39,13 @@ class DamageSystem : IteratingSystem(allOf(PlayerComponent::class,TransformCompo
 
             player.life -=  damage
             if(player.life <= 0f){
-                 entity.addComponent<RemoveComponent>(engine){
-                     delay = DEATH_EXPLOSION_DURATION
-                 }
+                gameEventManager.dispatchEvent(GameEvent.PlayerDeath.apply{
+                    this.distance = player.distance
+                })
+
+                entity.addComponent<RemoveComponent>(engine){
+                    delay = DEATH_EXPLOSION_DURATION
+                }
             }
         }
     }

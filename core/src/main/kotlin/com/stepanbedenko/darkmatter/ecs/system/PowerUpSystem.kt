@@ -4,10 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
-import com.stepanbedenko.darkmatter.GameEventCollectPowerUp
-import com.stepanbedenko.darkmatter.GameEventManager
-import com.stepanbedenko.darkmatter.GameEventType
-import com.stepanbedenko.darkmatter.V_WIDTH
+import com.stepanbedenko.darkmatter.*
 import com.stepanbedenko.darkmatter.ecs.component.*
 import ktx.ashley.*
 import ktx.collections.GdxArray
@@ -143,11 +140,11 @@ class PowerUpSystem(
 
             }
         }
-        gameEventManager.dispatchEvent(GameEventType.COLLECT_POWER_UP,
-        GameEventCollectPowerUp.apply {
+        gameEventManager.dispatchEvent(GameEvent.CollectPowerUp.apply {
             this.player = player
             this.type = powerUpComponent.type
         })
+
         powerUp.addComponent<RemoveComponent>(engine)
     }
 }

@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.stepanbedenko.darkmatter.DarkMatter
-import com.stepanbedenko.darkmatter.UNIT_SCALE
-import com.stepanbedenko.darkmatter.V_WIDTH
+import com.stepanbedenko.darkmatter.*
 import com.stepanbedenko.darkmatter.ecs.component.*
 import com.stepanbedenko.darkmatter.ecs.system.AttachSystem
 import com.stepanbedenko.darkmatter.ecs.system.DAMAGE_AREA_HEIGHT
@@ -19,18 +17,29 @@ import ktx.log.Logger
 import ktx.log.logger
 import javax.swing.text.html.parser.Entity
 import kotlin.math.min
+import kotlin.reflect.KClass
 
 private val LOG: Logger = logger<SecondScreen>()
 private const val MAX_DELTA_TIME = 1/20f
 
-class GameScreen(game: DarkMatter) : DarkMatterScreen(game) {
+class GameScreen(game: DarkMatter) : DarkMatterScreen(game),GameEventListener {
     override fun show() {
         LOG.debug {"Game screen is shown"}
+        gameEventManager.addListener(GameEvent.PlayerDeath::class, this)
 
+        spawnPlayer()
 
+    }
+
+    override fun hide() {
+        super.hide()
+        gameEventManager.removeListener(this)
+    }
+
+    private fun spawnPlayer() {
         val playerShip = engine.entity {
-            with<TransformComponent>{
-                setInitialPosition(4.5f,8f,-1f)
+            with<TransformComponent> {
+                setInitialPosition(4.5f, 8f, -1f)
             }
             with<MoveComponent>()
             with<GraphicComponent>()
@@ -38,34 +47,41 @@ class GameScreen(game: DarkMatter) : DarkMatterScreen(game) {
             with<FacingComponent>()
         }
 
-        val fireAttach = engine.entity {
+        engine.entity {
             with<TransformComponent>()
             with<AttachComponent> {
                 entity = playerShip
                 offset.set(0f * UNIT_SCALE, -12f * UNIT_SCALE)
             }
             with<GraphicComponent>()
-            with<AnimationComponent>{
+            with<AnimationComponent> {
                 type = AnimationType.FIRE
             }
         }
 
         engine.entity {
-            with<TransformComponent>{
+            with<TransformComponent> {
                 size.set(
                     V_WIDTH.toFloat(),
                     DAMAGE_AREA_HEIGHT
                 )
             }
-            with<AnimationComponent>{ type =AnimationType.DARK_MATTER }
+            with<AnimationComponent> { type = AnimationType.DARK_MATTER }
             with<GraphicComponent>()
         }
-
     }
-
 
 
     override fun render(delta: Float) {
         engine.update(min(MAX_DELTA_TIME, delta))
+    }
+
+    override fun onEvent(event: GameEvent) {
+        when(event){
+            is GameEvent.PlayerDeath -> {
+                spawnPlayer()
+            }
+            GameEvent.CollectPowerUp -> TODO()
+        }
     }
 }
