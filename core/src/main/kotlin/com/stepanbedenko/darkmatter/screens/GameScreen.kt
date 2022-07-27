@@ -1,11 +1,13 @@
 package com.stepanbedenko.darkmatter.screens
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.stepanbedenko.darkmatter.*
+import com.stepanbedenko.darkmatter.ecs.asset.MusicAsset
 import com.stepanbedenko.darkmatter.ecs.component.*
 import com.stepanbedenko.darkmatter.ecs.system.AttachSystem
 import com.stepanbedenko.darkmatter.ecs.system.DAMAGE_AREA_HEIGHT
@@ -19,14 +21,18 @@ import javax.swing.text.html.parser.Entity
 import kotlin.math.min
 import kotlin.reflect.KClass
 
-private val LOG: Logger = logger<SecondScreen>()
+private val LOG: Logger = logger<GameScreen>()
 private const val MAX_DELTA_TIME = 1/20f
 
-class GameScreen(game: DarkMatter) : DarkMatterScreen(game),GameEventListener {
+class GameScreen(
+    game: DarkMatter,
+    private val engine: Engine = game.engine
+    ) : DarkMatterScreen(game),GameEventListener {
     override fun show() {
         LOG.debug {"Game screen is shown"}
         gameEventManager.addListener(GameEvent.PlayerDeath::class, this)
 
+        audioService.play(MusicAsset.GAME)
         spawnPlayer()
 
     }
@@ -82,6 +88,9 @@ class GameScreen(game: DarkMatter) : DarkMatterScreen(game),GameEventListener {
                 spawnPlayer()
             }
             GameEvent.CollectPowerUp -> TODO()
+            else -> {
+
+            }
         }
     }
 }

@@ -16,10 +16,17 @@ sealed class GameEvent{
         override fun toString() = "PlayerDeath(distance=$distance )"
     }
     object CollectPowerUp : GameEvent(){
-        lateinit var player: Entity
+        lateinit var player: com.badlogic.ashley.core.Entity
         var type = PowerUpType.NONE
 
         override fun toString() = "CollectPowerUp(player=$player, type=$type)"
+    }
+    object PlayerHit : GameEvent(){
+        lateinit var player: com.badlogic.ashley.core.Entity
+        var life = 0f
+        var maxLife = 0f
+
+        override fun toString() = "PlayerHit(player=$player, life=$life, maxLife=$maxLife)"
     }
 }
 

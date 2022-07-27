@@ -16,10 +16,6 @@ private val LOG = logger<PowerUpSystem>()
 private val MAX_SPAWN_INTERVAL = 1.5f
 private val MIN_SPAWN_INTERVAL = 0.9f
 private val POWER_UP_SPEED = -8.75f
-private val BOOST_1_GAIN = 3f
-private val BOOST_2_GAIN = 3.75f
-private val LIFE_GAIN = 25f
-private val SHIELD_GAIN = 25f
 
 private class SpawnPattern(
     type1:PowerUpType = PowerUpType.NONE,
@@ -31,7 +27,8 @@ private class SpawnPattern(
 )
 
 class PowerUpSystem(
-    private val gameEventManager: GameEventManager
+    private val gameEventManager: GameEventManager,
+    private val audioService: AudioService
 ) : IteratingSystem(allOf(PowerUpComponent::class,TransformComponent::class).exclude(RemoveComponent::class.java).get()) {
     private val playerRectangle = Rectangle()
     private val powerUpRectangle = Rectangle()
@@ -116,35 +113,23 @@ class PowerUpSystem(
         val powerUpComponent = powerUp[PowerUpComponent.mapper]
         require(powerUpComponent!=null){"Entity |entity| must have a PowerUpComponent. entity=$powerUp"}
 
-        LOG.debug{"Picking up power up of type ${powerUpComponent.type}"}
+        powerUpComponent.type.also { powerUpType ->
+            LOG.debug{"Picking up power up of type ${powerUpComponent.type}"}
 
-        when(powerUpComponent.type){
-            PowerUpType.SPEED_1 -> {
-                player[MoveComponent.mapper]?.let { it.speed.y += BOOST_1_GAIN}
+            player[MoveComponent.mapper]?.let { it.speed.y += powerUpType.speedGain }
+            player[PlayerComponent.mapper]?.let {
+                it.life = min(it.maxLife, it.life + powerUpType.lifeGain)
+                it.shield = min(it.maxShield, it.shield + powerUpType.shieldGain)
             }
-            PowerUpType.SPEED_2 -> {
-                player[MoveComponent.mapper]?.let { it.speed.y += BOOST_2_GAIN}
-            }
-            PowerUpType.LIFE ->{
-                player[PlayerComponent.mapper]?.let {
-                    it.life = min(it.maxLife, it.life + LIFE_GAIN)
-                }
-            }
-            PowerUpType.SHIELD -> {
-                player[PlayerComponent.mapper]?.let {
-                    it.shield = min(it.maxShield, it.shield + SHIELD_GAIN)
-                }
-            }
-            else -> {
-                LOG.error { "Unsupported power up of type ${powerUpComponent.type}" }
 
-            }
+            gameEventManager.dispatchEvent(GameEvent.CollectPowerUp.apply {
+                this.player = player
+                this.type = powerUpType
+            })
+
         }
-        gameEventManager.dispatchEvent(GameEvent.CollectPowerUp.apply {
-            this.player = player
-            this.type = powerUpComponent.type
-        })
 
         powerUp.addComponent<RemoveComponent>(engine)
+
     }
 }
