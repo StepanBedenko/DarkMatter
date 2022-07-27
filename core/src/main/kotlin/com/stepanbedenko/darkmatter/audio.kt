@@ -44,7 +44,7 @@ class DefaultAudioService(private val assets: AssetStorage) : AudioService {
     private val soundRequestPool = SoundRequestPool()
     private val soundRequests = EnumMap<SoundAsset, SoundRequest>(SoundAsset::class.java)
     private var currentMusic: Music? = null
-    private var currentMusicAsset = MusicAsset.GAME
+    private var currentMusicAsset: MusicAsset? = null
 
     override fun play(soundAsset: SoundAsset, volume: Float) {
         when {
@@ -74,17 +74,15 @@ class DefaultAudioService(private val assets: AssetStorage) : AudioService {
     }
 
     override fun play(musicAsset: MusicAsset, volume: Float, loop: Boolean) {
-        if(currentMusic!=null){
-            currentMusic?.stop()
-            KtxAsync.launch {
-                assets.unload(currentMusicAsset.descriptor)
-            }
-        }
-
         val musicDeferred = assets.loadAsync(musicAsset.descriptor)
         KtxAsync.launch {
             musicDeferred.join()
             if(assets.isLoaded(musicAsset.descriptor)){
+                currentMusic?.stop()
+                val currentAsset = currentMusicAsset
+                if(currentAsset != null){
+                    assets.unload(currentAsset.descriptor)
+                }
                 currentMusicAsset = musicAsset
                 currentMusic = assets[musicAsset.descriptor].apply {
                     this.volume = volume

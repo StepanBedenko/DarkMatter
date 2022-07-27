@@ -4,10 +4,8 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Application.LOG_DEBUG
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.stepanbedenko.darkmatter.ecs.asset.TextureAsset
 import com.stepanbedenko.darkmatter.ecs.asset.TextureAtlasAsset
@@ -43,7 +41,7 @@ class DarkMatter : KtxGame<DarkMatterScreen>() {
 
         addSystem(PlayerInputSystem(gameViewport))
         addSystem(MoveSystem())
-        addSystem(PowerUpSystem(gameEventManager))
+        addSystem(PowerUpSystem(gameEventManager, audioService))
         addSystem(DamageSystem(gameEventManager))
         addSystem(CameraShakeSystem(gameViewport.camera, gameEventManager))
         addSystem(PlayerAnimationSystem(
@@ -63,7 +61,7 @@ class DarkMatter : KtxGame<DarkMatterScreen>() {
         addSystem(RenderSystem(batch,
             gameViewport,
             uiViewport,
-            assets[TextureAsset.BACKGROUND.desriptor],
+            assets[TextureAsset.BACKGROUND.descriptor],
             gameEventManager)
         )
         addSystem(RemoveSystem())

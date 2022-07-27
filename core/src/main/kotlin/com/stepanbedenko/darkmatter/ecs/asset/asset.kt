@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 enum class TextureAsset(
     filename: String,
     directory: String = "graphics",
-    val desriptor: AssetDescriptor<Texture> = AssetDescriptor("$directory/$filename", Texture::class.java)
+    val descriptor: AssetDescriptor<Texture> = AssetDescriptor("$directory/$filename", Texture::class.java)
 ){
     BACKGROUND("background.png")
 }

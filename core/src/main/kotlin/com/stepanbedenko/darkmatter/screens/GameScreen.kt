@@ -80,6 +80,7 @@ class GameScreen(
 
     override fun render(delta: Float) {
         engine.update(min(MAX_DELTA_TIME, delta))
+        audioService.update()
     }
 
     override fun onEvent(event: GameEvent) {

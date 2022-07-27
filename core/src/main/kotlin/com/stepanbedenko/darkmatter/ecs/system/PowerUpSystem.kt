@@ -121,6 +121,7 @@ class PowerUpSystem(
                 it.life = min(it.maxLife, it.life + powerUpType.lifeGain)
                 it.shield = min(it.maxShield, it.shield + powerUpType.shieldGain)
             }
+            audioService.play(powerUpType.soundAsset)
 
             gameEventManager.dispatchEvent(GameEvent.CollectPowerUp.apply {
                 this.player = player
