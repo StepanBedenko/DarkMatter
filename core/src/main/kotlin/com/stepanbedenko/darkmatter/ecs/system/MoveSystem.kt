@@ -10,6 +10,7 @@ import com.stepanbedenko.darkmatter.ecs.component.MoveComponent
 import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.ashley.mapperFor
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -87,7 +88,9 @@ class MoveSystem : IteratingSystem(allOf(TransformComponent::class, MoveComponen
             MAX_VER_POS_SPEED
         )
 
+        val oldY = transform.position.y
         moveEntity(transform,move, deltaTime)
+        player.distance += abs(transform.position.y - oldY)
     }
 
     private fun moveEntity(transform: TransformComponent, move: MoveComponent, deltaTime: Float) {

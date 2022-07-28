@@ -17,6 +17,8 @@ import ktx.ashley.with
 import ktx.graphics.use
 import ktx.log.Logger
 import ktx.log.logger
+import ktx.preferences.flush
+import ktx.preferences.set
 import javax.swing.text.html.parser.Entity
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -86,6 +88,10 @@ class GameScreen(
     override fun onEvent(event: GameEvent) {
         when(event){
             is GameEvent.PlayerDeath -> {
+                LOG.debug { "Player died with a distance of ${event.distance}" }
+                preferences.flush {
+                    this["highscore"] = event.distance
+                }
                 spawnPlayer()
             }
             GameEvent.CollectPowerUp -> TODO()

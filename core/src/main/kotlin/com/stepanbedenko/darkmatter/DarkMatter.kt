@@ -40,7 +40,6 @@ class DarkMatter : KtxGame<DarkMatterScreen>() {
     val preferences: Preferences by lazy { Gdx.app.getPreferences("dark-matter") }
 
     val engine: Engine by lazy {
-
         PooledEngine().apply {
         val graphicAtlas = assets[TextureAtlasAsset.GAME_GRAPHICS.descriptor]
 
