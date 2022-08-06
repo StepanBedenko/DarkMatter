@@ -18,6 +18,7 @@ import ktx.graphics.use
 import ktx.log.Logger
 import ktx.log.logger
 import ktx.preferences.flush
+import ktx.preferences.get
 import ktx.preferences.set
 import javax.swing.text.html.parser.Entity
 import kotlin.math.min
@@ -32,6 +33,7 @@ class GameScreen(
     ) : DarkMatterScreen(game),GameEventListener {
     override fun show() {
         LOG.debug {"Game screen is shown"}
+        LOG.debug { "${preferences["highscore", 0f]}" }
         gameEventManager.addListener(GameEvent.PlayerDeath::class, this)
 
         audioService.play(MusicAsset.GAME)
